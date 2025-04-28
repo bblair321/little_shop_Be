@@ -2,7 +2,7 @@ module Api
   module V1
     class MerchantCouponsController < ApplicationController
       before_action :set_merchant
-      before_action :set_coupon, only: [:show]
+      before_action :set_coupon, only: [:show]  # Add this line to load coupon for 'show'
 
       def index
         coupons = @merchant.coupons
@@ -13,12 +13,19 @@ module Api
 
       def show
         render json: {
-          data: {
-            id: @coupon.id.to_s,
-            type: "coupon",
-            attributes: coupon_attributes
-          }
+          data: format_coupon(@coupon)  # Use @coupon here
         }
+      end
+
+      def create
+        coupon = @merchant.coupons.build(coupon_params)
+        if coupon.save
+          render json: {
+            data: format_coupon(coupon)
+          }, status: :created
+        else
+          render json: { errors: coupon.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       private
@@ -33,6 +40,10 @@ module Api
         @coupon = @merchant.coupons.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Coupon not found" }, status: :not_found
+      end
+
+      def coupon_params
+        params.require(:coupon).permit(:name, :code, :discount_type, :discount_value, :active)
       end
 
       def coupon_attributes
