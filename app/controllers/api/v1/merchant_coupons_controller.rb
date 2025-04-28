@@ -2,7 +2,7 @@ module Api
   module V1
     class MerchantCouponsController < ApplicationController
       before_action :set_merchant
-      before_action :set_coupon, only: [:show]  # Add this line to load coupon for 'show'
+      before_action :set_coupon, only: [:show, :deactivate]
 
       def index
         coupons = @merchant.coupons
@@ -13,7 +13,11 @@ module Api
 
       def show
         render json: {
-          data: format_coupon(@coupon)  # Use @coupon here
+          data: {
+            id: @coupon.id.to_s,
+            type: "coupon",
+            attributes: coupon_attributes
+          }
         }
       end
 
@@ -25,6 +29,16 @@ module Api
           }, status: :created
         else
           render json: { errors: coupon.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      def deactivate
+        if @coupon.update(active: false)
+          render json: {
+            data: format_coupon(@coupon)
+          }, status: :ok
+        else
+          render json: { error: "Failed to deactivate coupon" }, status: :unprocessable_entity
         end
       end
 
