@@ -1,7 +1,7 @@
 module Api
   module V1
     class CouponsController < ApplicationController
-      before_action :set_coupon, only: [:show, :deactivate]
+      before_action :set_coupon, only: [:show, :deactivate, :activate]  # Add :activate here
 
       def show
         render json: {
@@ -11,6 +11,16 @@ module Api
             attributes: coupon_attributes
           }
         }
+      end
+
+      def activate
+        if @coupon.update(active: true)
+          render json: {
+            data: format_coupon(@coupon)
+          }, status: :ok
+        else
+          render json: { error: "Failed to activate coupon" }, status: :unprocessable_entity
+        end
       end
 
       def deactivate
@@ -38,7 +48,6 @@ module Api
           discount_type: @coupon.discount_type,
           discount_value: @coupon.discount_value,
           active: @coupon.active,
-          merchant_id: @coupon.merchant_id,
           used_count: @coupon.invoices.count
         }
       end

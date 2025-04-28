@@ -23,6 +23,7 @@ Rails.application.routes.draw do
         resources :coupons, only: [:index, :show, :create] do
           member do
             patch 'deactivate'
+            patch 'activate'
           end
         end
       end
