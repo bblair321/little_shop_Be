@@ -1,8 +1,16 @@
 class Merchant < ApplicationRecord
   has_many :items, dependent: :destroy
   has_many :invoices, dependent: :destroy
-  validates_presence_of :name
+  has_many :coupons, dependent: :destroy
 
+  validates_presence_of :name
+  validate :merchant_cannot_have_more_than_five_active_coupons, on: :create
+
+  def merchant_cannot_have_more_than_five_active_coupons
+    if coupons.where(active: true).count >= 5
+      errors.add(:coupons, "cannot have more than 5 active coupons")
+    end
+  end
 
   def self.search_by_name(name)
     where('lower(name) ILIKE ?', "%#{name.downcase}%")
@@ -27,7 +35,7 @@ class Merchant < ApplicationRecord
       .where(invoices: { status: 'returned' })
       .distinct
   end
-  
+
   def self.with_item_counts
      left_joins(:items)
       .select("merchants.*, COUNT(DISTINCT items.id) AS item_count")
