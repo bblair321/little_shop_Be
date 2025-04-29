@@ -3,6 +3,28 @@ module Api
     class CouponsController < ApplicationController
       before_action :set_coupon, only: [:show, :deactivate, :activate]  # Add :activate here
 
+      def index
+        merchant = Merchant.find(params[:merchant_id])
+        coupons = merchant.coupons
+      
+        render json: {
+          data: coupons.map do |coupon|
+            {
+              id: coupon.id.to_s,
+              type: "coupon",
+              attributes: {
+                name: coupon.name,
+                code: coupon.code,
+                discount_type: coupon.discount_type,
+                discount_value: coupon.discount_value,
+                active: coupon.active,
+                used_count: coupon.invoices.count
+              }
+            }
+          end
+        }
+      end
+
       def show
         render json: {
           data: {
