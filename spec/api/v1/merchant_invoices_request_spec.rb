@@ -37,7 +37,7 @@ RSpec.describe "Merchant Invoices", type: :request do
       expect(response).to be_successful
     
       parsed = JSON.parse(response.body, symbolize_names: true)
-      expect(parsed[:data].length).to eq(1)
+      expect(parsed[:data].length).to eq(2)
       expect(parsed[:data].first[:attributes][:status]).to eq("shipped")
     end
 

@@ -44,6 +44,7 @@ group :development, :test do
   gem "pgreset"
   gem 'jsonapi-serializer'
   gem 'shoulda-matchers'
+  gem 'factory_bot_rails'
 end
 
 group :development do

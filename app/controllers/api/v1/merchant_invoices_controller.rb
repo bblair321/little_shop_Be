@@ -15,8 +15,8 @@ module Api
 
       def set_merchant
         @merchant = Merchant.find(params[:merchant_id])
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: "Merchant not found" }, status: :not_found
+      rescue ActiveRecord::RecordNotFound => e
+        render json: { errors: [e.message] }, status: :not_found
       end
 
       def format_invoice(invoice)

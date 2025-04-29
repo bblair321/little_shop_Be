@@ -1,7 +1,7 @@
 module Api
   module V1
     class CouponsController < ApplicationController
-      before_action :set_coupon, only: [:show, :deactivate, :activate]  # Add :activate here
+      before_action :set_coupon, only: [:show, :deactivate, :activate]
 
       def index
         merchant = Merchant.find(params[:merchant_id])
