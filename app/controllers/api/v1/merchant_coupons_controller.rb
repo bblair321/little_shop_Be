@@ -6,6 +6,12 @@ module Api
 
       def index
         coupons = @merchant.coupons
+      
+        if params[:active].present?
+          active_value = ActiveModel::Type::Boolean.new.cast(params[:active])
+          coupons = coupons.where(active: active_value)
+        end
+      
         render json: {
           data: coupons.map { |coupon| format_coupon(coupon) }
         }, status: :ok

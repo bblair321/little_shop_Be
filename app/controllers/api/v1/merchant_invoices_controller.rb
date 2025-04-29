@@ -1,16 +1,35 @@
 module Api
   module V1
-    class MerchantInvoicesController < BaseController
+    class MerchantInvoicesController < ApplicationController
+      before_action :set_merchant
+
       def index
-        merchant = Merchant.find(params[:merchant_id])
-        
-        if params[:status].present?
-          invoices = merchant.invoices.where(status: params[:status])
-        else
-          invoices = merchant.invoices
-        end
-        
-        render json: InvoiceSerializer.new(invoices)
+        invoices = @merchant.invoices
+
+        render json: {
+          data: invoices.map { |invoice| format_invoice(invoice) }
+        }, status: :ok
+      end
+
+      private
+
+      def set_merchant
+        @merchant = Merchant.find(params[:merchant_id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Merchant not found" }, status: :not_found
+      end
+
+      def format_invoice(invoice)
+        {
+          id: invoice.id.to_s,
+          type: "invoice",
+          attributes: {
+            customer_id: invoice.customer_id.to_s,
+            merchant_id: @merchant.id.to_s,
+            coupon_id: invoice.coupon_id&.to_s,
+            status: invoice.status
+          }
+        }
       end
     end
   end
